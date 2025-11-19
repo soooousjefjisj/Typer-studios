@@ -204,3 +204,334 @@
   </script>
 </body>
 </html>
+Features:
+
+10 stages with progressively harder sentences.
+
+Stage number is shown on top.
+
+When a stage is finished correctly, it proceeds to the next automatically.
+
+After finishing stage 10, game restarts from stage 1.
+
+Timer and progress bar reset every stage.
+
+Restart button resets to stage 1.
+
+Open this file in a browser to test the multi-stage typing game. Let me know if you want any further customizations!
+
+ok now can you upgrade it to be 100 stages and make the sentaces channenging as more as you go on and add a reasonable amount of time
+
+Here is an upgraded version of the typing game with 100 stages featuring increasingly challenging sentences and a reasonable time allowance that scales with each stage. The time limit grows moderately with difficulty to balance challenge and playability:
+
+xml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Typing Game 100 Stages</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f5f5f5;
+      box-shadow: 0 0 10px #ccc;
+    }
+    .text {
+      font-size: 22px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+      min-height: 60px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+    }
+    .progress-bar {
+      height: 6px;
+      margin-bottom: 18px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0;
+      background: #3bce63;
+      transition: width 0.2s;
+      border-radius: 3px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 60px;
+      font-size: 18px;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      box-sizing: border-box;
+      resize: none;
+      background: #fafafa;
+    }
+    .correct {
+      color: #32a852;
+      background: #e7ffe1;
+      border-radius: 2px;
+    }
+    .wrong {
+      color: #ff3131;
+      background: #ffe8e8;
+      border-radius: 2px;
+    }
+    .timer {
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: block;
+      font-size: 18px;
+      text-align: right;
+    }
+    #stage {
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 8px 18px;
+      font-size: 16px;
+      background: #32a852;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    button:hover {
+      background: #2b9144;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">Stage: 1 / 100</div>
+  <div class="timer" id="timer">Time: 30</div>
+  <div class="progress-bar"><div class="bar" id="bar"></div></div>
+  <div class="text" id="text"></div>
+  <textarea id="input" placeholder="Start typing here..." autofocus></textarea>
+  <button onclick="restart()">Restart</button>
+
+  <script>
+    // Predefined 100 sentences with increasing complexity and length
+    const stages = [
+      "The cat sat on the mat.",
+      "Practice typing every day to improve.",
+      "Typing quickly requires accuracy and focus.",
+      "The quick brown fox jumps over the lazy dog.",
+      "Constant repetition helps build muscle memory for typing.",
+      "Learning new words boosts typing speed substantially.",
+      "Advanced typists use all fingers with ease and accuracy.",
+      "Mistakes slow your progress; aim for precision first.",
+      "Different sentence structures increase cognitive challenge while typing.",
+      "Consistent practice with diverse texts enhances adaptability.",
+      // 11-20 medium difficulty
+      "Sophisticated keyboard skills boost productivity greatly and efficiently.",
+      "The brisk winter wind chilled everyone, but the typing continued.",
+      "Success in typing depends on patience, discipline, and continuous effort.",
+      "Errors accumulate when haste overtakes careful thought in typing sequences.",
+      "Mastering the keyboard eases many tasks and opens career doors.",
+      "Punctuation marks and capitalization add realistic typing conditions.",
+      "Fingers dance across keys following thoughts quicker than speech.",
+      "Complex vocabulary and lengthy sentences improve mental agility.",
+      "Typing tests with timed stages simulate real-world computer use.",
+      "Each day’s practice contributes to remarkable improvement fast.",
+      // 21-40 challenging
+      "Ornithologists adeptly identify various species by their unique calls.",
+      "Technological advancement demands unparalleled proficiency in computer operation.",
+      "Improving typing speed requires a balance of accuracy and rapidity.",
+      "Continually pushing limits refines skills and reveals new potential.",
+      "The enigmatic puzzle required thoughtful analysis and precise execution.",
+      "Effective communication often depends on swift, accurate keyboard input.",
+      "Accompanying complex thoughts with fluid typing is a learned art.",
+      "Understanding mistakes leads to targeted practice and better results.",
+      "Daily challenges keep motivation high and combat typing fatigue.",
+      "Advanced exercises incorporate symbols, numbers, and foreign characters.",
+      "Complex sentences contain clauses that test dexterity and comprehension.",
+      "Fluency emerges not only from speed but from well-timed pauses.",
+      "Error recovery methods influence overall performance under timed conditions.",
+      "Specialized typing includes programming syntax, demanding intense focus.",
+      "Interpreting visual text patterns aids in rapid and accurate duplication.",
+      "Becoming competent requires structured lessons and incremental difficulty.",
+      "Descriptive passages enhance immersion and encourage varied word usage.",
+      "Persistent practice transforms awkward finger movements into graceful choreography.",
+      "Typing games increase engagement and provide feedback for continual growth.",
+      "Adaptive difficulty levels ensure steady progression without overwhelming stress.",
+      // 41-60 very challenging
+      "Utilizing advanced touch-typing techniques increases ergonomic efficiency.",
+      "The juxtaposition of speed and precision defines expert keyboarding skills.",
+      "Complex orthographic patterns present significant difficulties to newcomers.",
+      "Practitioners must allocate focused intervals for maximal skill retention.",
+      "Depending solely on muscle memory without understanding structure impairs progress.",
+      "Developing ambidextrous coordination enhances total typing throughput.",
+      "The strategic organization of keys reduces physical strain during prolonged sessions.",
+      "Incorporating mnemonic devices aids in memorizing complex key sequences.",
+      "Linguistic diversity introduces new character sets and typing rhythms.",
+      "Significant improvement demands dedication beyond casual daily practice.",
+      "Analyzing error patterns allows customization of remedial typing exercises.",
+      "Advanced drills integrate numerals, punctuation, and special symbols seamlessly.",
+      "Variable speed drills condition reflexes and adaptability under pressure.",
+      "Enhancing peripheral vision supports rapid response to on-screen prompts.",
+      "Hybrid typing styles blend touch-typing and sight-reading techniques.",
+      "Metronome-assisted practice fosters consistent keystroke timing and rhythm.",
+      "Phonetic awareness complements visual recognition of challenging vocabulary.",
+      "Frequent breaks and ergonomic setup are crucial for long-term proficiency.",
+      "Multi-sensory learning approaches expedite the acquisition of typing fluency.",
+      "Virtual competitions motivate users to surpass pre-established typing benchmarks.",
+      // 61-80 expert level
+      "Sophisticated coding scripts require flawless syntax input and swift error correction.",
+      "Simultaneous auditory instructions and text transcription improve cognitive multitasking.",
+      "Comprehensive skill sets include transcription, data entry, and coding abilities.",
+      "Multilingual typists adjust to diverse keyboard layouts and language rules.",
+      "Real-time adaptive feedback mechanisms enhance learner engagement substantially.",
+      "State-of-the-art typing applications employ gamification to maintain user interest.",
+      "Periodic skill assessments facilitate objective measurement of progression metrics.",
+      "Neuroplasticity in adults allows acquisition of typing expertise with appropriate training.",
+      "Virtual reality environments simulate immersive typing challenges for advanced users.",
+      "Extending typing endurance requires physical conditioning and mental resilience.",
+      "Exceeding a threshold speed demands high accuracy to prevent error cascades.",
+      "Experimental programs integrate AI tutors for personalized typing improvement plans.",
+      "High-pressure scenarios such as live transcription test utmost concentration and speed.",
+      "Competitions offer incentives that accelerate skill development beyond casual practice.",
+      "Cumulative difficulty ladders ensure continuous motivation and progressive challenge.",
+      "Ergonomic keyboards and layouts reduce injury risk among professional typists.",
+      "Cross-training with music and rhythmic exercises reinforce fine motor control.",
+      "Artificial intelligence analyzes keystroke dynamics to detect and correct bad habits.",
+      "Collaborative typing challenges foster social learning and competitive spirit.",
+      "Integration with productivity tools embeds typing practice in everyday workflows.",
+      // 81-100 master level
+      "Mastering nuanced finger placements decreases latency and maximizes throughput immensely.",
+      "Advanced typographic characters and diacritics introduce unique ergonomic challenges.",
+      "Professional transcriptionists maintain exceptional speed under demanding live conditions.",
+      "Precision and speed converge in championships showcasing top-tier typists worldwide.",
+      "Cutting-edge haptic feedback devices simulate mechanical keyboards improving realism.",
+      "Obfuscated text exercises sharpen pattern recognition and error recovery aptitude.",
+      "Polyglot typists navigate multiple alphabets requiring rapid linguistic switching.",
+      "Synthetic syllable drills promote phoneme-key correspondence strengthening neuro pathways.",
+      "Adaptive learning algorithms customize drills to individual weaknesses effectively.",
+      "Ultimate goal: Achieve seamless typing with near-zero errors in extended sessions.",
+      "Completing all stages demonstrates mastery of both fundamentals and expert techniques.",
+      "Refining micro-movements optimizes keystroke economy and reduces fatigue.",
+      "Variable phrase lengths and complexities mimic natural language unpredictability.",
+      "Selective speed bursts train reaction times to complex visual and cognitive stimuli.",
+      "Highly specialized vocabulary tests prepare typists for professional domains.",
+      "Resilience training counters mental fatigue in prolonged high-stakes typing tasks.",
+      "Transitioning from practiced drills to spontaneous typing ensures real-world applicability.",
+      "State-of-the-art metrics evaluate dexterity, speed, accuracy, and ergonomic soundness.",
+      "The final stage challenges all prior skills with an intricate, lengthy passage.",
+      "Completion signifies typing proficiency suitable for elite transcription and data entry careers."
+    ];
+
+    let currentStage = 0;
+    let charEls = [];
+    let timerInterval = null;
+    let startTime = null;
+    let baseTimeLimit = 30;
+    let gameEnded = false;
+
+    function getTimeLimitForStage(stage) {
+      // Increase time with stage; roughly base + stage/2 seconds capped around 80 secs
+      return Math.min(baseTimeLimit + Math.floor(stage / 2), 80);
+    }
+
+    function populateText(str) {
+      const text = document.getElementById("text");
+      text.innerHTML = "";
+      charEls = [];
+      str.split("").forEach(letter => {
+        const span = document.createElement("span");
+        span.innerText = letter;
+        text.appendChild(span);
+        charEls.push(span);
+      });
+    }
+
+    function resetCharEls() {
+      charEls.forEach(charEl => {
+        charEl.classList.remove("correct");
+        charEl.classList.remove("wrong");
+      });
+    }
+
+    function startGame() {
+      document.getElementById("input").value = "";
+      gameEnded = false;
+      if (currentStage >= stages.length) currentStage = 0;
+      document.getElementById("stage").innerText = "Stage: " + (currentStage + 1) + " / 100";
+      populateText(stages[currentStage]);
+      const timeLimit = getTimeLimitForStage(currentStage + 1);
+      document.getElementById("timer").innerText = "Time: " + timeLimit;
+      if (timerInterval) clearInterval(timerInterval);
+      startTime = Date.now();
+      timerInterval = setInterval(() => updateTimer(timeLimit), 100);
+      document.getElementById("bar").style.width = "0%";
+    }
+
+    function endGame(success) {
+      gameEnded = true;
+      clearInterval(timerInterval);
+      setTimeout(() => {
+        if (success) {
+          alert("Great job! You finished stage " + (currentStage + 1) + ".");
+          currentStage++;
+          startGame();
+        } else {
+          alert("Time's up! Try again at stage " + (currentStage + 1) + ".");
+          startGame();
+        }
+      }, 100);
+    }
+
+    function updateTimer(timeLimit) {
+      let elapsed = Math.floor((Date.now() - startTime) / 1000);
+      let remaining = timeLimit - elapsed;
+      document.getElementById("timer").innerText = "Time: " + remaining;
+      if (remaining <= 0 && !gameEnded) {
+        endGame(false);
+      }
+    }
+
+    function updateProgressBar(percent) {
+      document.getElementById("bar").style.width = percent + "%";
+    }
+
+    document.getElementById("input").addEventListener("input", () => {
+      if (gameEnded) return;
+      const val = document.getElementById("input").value;
+      resetCharEls();
+      let errorCount = 0;
+      let currentText = stages[currentStage];
+      let minLen = Math.min(val.length, currentText.length);
+      for (let i = 0; i < minLen; i++) {
+        if (val[i] === currentText[i]) {
+          charEls[i].classList.add("correct");
+        } else {
+          charEls[i].classList.add("wrong");
+          errorCount++;
+        }
+      }
+      // If user input shorter than sentence, highlight remaining letters as neutral
+      updateProgressBar((val.length / currentText.length) * 100);
+      if (val.length === currentText.length && errorCount === 0) {
+        endGame(true);
+      }
+    });
+
+    function restart() {
+      currentStage = 0;
+      startGame();
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html
