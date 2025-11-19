@@ -2,405 +2,292 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Typing Game with Levels</title>
+  <title>Typing Game</title>
   <style>
-    /* Center everything vertically and horizontally */
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
     body {
-      padding: 0;
-    }
-    .container {
-      background: #ffffffdd;
-      box-shadow: 0 20px 40px rgb(0 0 0 / 0.15);
-      border-radius: 15px;
-      width: 700px;
-      max-width: 90vw;
-      padding: 30px 40px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f5f5f5;
+      box-shadow: 0 0 10px #ccc;
     }
     #stage {
-      font-weight: 700;
-      font-size: 28px;
-      color: #333;
-      margin-bottom: 20px;
-      letter-spacing: 1px;
-      user-select: none;
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 10px;
     }
     .timer {
-      font-weight: 700;
-      font-size: 22px;
-      color: #444;
-      align-self: flex-end;
-      margin-bottom: 15px;
-      user-select: none;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 18px;
+      text-align: right;
     }
     .progress-bar {
-      width: 100%;
-      height: 10px;
+      height: 6px;
+      margin-bottom: 18px;
       background: #e0e0e0;
-      border-radius: 10px;
-      margin-bottom: 25px;
+      border-radius: 3px;
       overflow: hidden;
-      box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.1);
     }
     .bar {
       height: 100%;
       width: 0;
-      background: #5a9bf6;
-      border-radius: 10px 0 0 10px;
-      transition: width 0.25s ease;
-      box-shadow: 0 0 8px #5a9bf6aa;
+      background: #3bce63;
+      transition: width 0.2s;
+      border-radius: 3px;
     }
     .text {
-      font-size: 28px;
-      line-height: 1.4;
-      letter-spacing: 1.5px;
-      min-height: 90px;
-      width: 100%;
-      background: #fefefe;
-      border-radius: 15px;
-      border: 2px solid #c1c1c1;
-      padding: 20px 25px;
-      margin-bottom: 30px;
-      color: #222;
-      user-select: none;
-      box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.06);
-      white-space: pre-wrap;
+      font-size: 22px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+      min-height: 60px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
     }
     .correct {
-      color: #28a745;
-      background: #d4edda;
-      border-radius: 4px;
-      transition: background 0.3s ease;
+      color: #32a852;
+      background: #e7ffe1;
+      border-radius: 2px;
     }
     .wrong {
-      color: #dc3545;
-      background: #f8d7da;
-      border-radius: 4px;
-      transition: background 0.3s ease;
+      color: #ff3131;
+      background: #ffe8e8;
+      border-radius: 2px;
     }
     textarea {
       width: 100%;
-      min-height: 70px;
-      font-size: 22px;
-      padding: 18px 22px;
-      border-radius: 15px;
-      border: 2px solid #999;
+      min-height: 60px;
+      font-size: 20px;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      box-sizing: border-box;
       resize: none;
-      box-shadow: 0 5px 15px rgb(0 0 0 / 0.05);
-      outline-offset: 2px;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.2;
-      color: #222;
-      margin-bottom: 25px;
-    }
-    textarea:focus {
-      border-color: #5a9bf6;
-      box-shadow: 0 0 8px #5a9bf6aa;
+      background: #fafafa;
+      font-family: monospace;
     }
     button {
-      width: 160px;
-      padding: 15px 0;
-      font-size: 18px;
-      font-weight: 600;
+      padding: 8px 18px;
+      font-size: 16px;
+      background: #32a852;
       color: #fff;
-      background: #5a9bf6;
       border: none;
-      border-radius: 15px;
+      border-radius: 5px;
       cursor: pointer;
-      box-shadow: 0 8px 15px rgb(90 155 246 / 0.5);
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      user-select: none;
+      margin-top: 6px;
     }
     button:hover {
-      background-color: #4178d1;
-      box-shadow: 0 12px 20px rgb(65 120 209 / 0.7);
+      background: #2b9144;
     }
     #secretInput {
-      width: 400px;
-      font-size: 14px;
-      padding: 6px 10px;
-      border-radius: 10px;
+      font-size: 12px;
+      padding: 5px 8px;
+      width: 100%;
+      margin-top: 12px;
+      box-sizing: border-box;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      outline: none;
-      margin-top: 10px;
-      letter-spacing: 1.5px;
-      color: #555;
     }
-    #secretInput:focus {
-      border-color: #5a9bf6;
-      box-shadow: 0 0 6px #5a9bf6bb;
-    }
-    /* Overlay panel hidden by default */
     #secretPanel {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: #222d42ee;
-      color: #eee;
-      padding: 20px 25px;
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.8);
       display: none;
-      flex-direction: column;
-      align-items: center;
-      min-width: 260px;
-      z-index: 1000;
+      border: 1px solid #888;
+      background: #eee;
+      padding: 12px 16px;
+      margin-top: 12px;
+      border-radius: 5px;
     }
     #secretPanel button {
-      width: 140px;
-      margin-top: 12px;
-      background: #28a745;
-      box-shadow: 0 8px 18px rgb(40 167 69 / 0.6);
+      background: #0066CC;
+      margin-top: 8px;
+      width: 100%;
     }
     #secretPanel button:hover {
-      background: #1e7e34;
-      box-shadow: 0 12px 22px rgb(30 126 52 / 0.8);
-    }
-    #closePanel {
-      background: #dc3545;
-      margin-top: 10px;
-      width: 140px;
-    }
-    #closePanel:hover {
-      background: #a71d2a;
-    }
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px 20px 30px;
-        width: 95vw;
-      }
-      .text {
-        font-size: 20px;
-        min-height: 70px;
-      }
-      textarea {
-        font-size: 18px;
-        min-height: 60px;
-      }
-      #stage {
-        font-size: 24px;
-      }
-      .timer {
-        font-size: 18px;
-      }
-      button {
-        width: 140px;
-        font-size: 16px;
-        padding: 12px 0;
-      }
-      #secretInput {
-        width: 90vw;
-        font-size: 16px;
-      }
-      #secretPanel {
-        min-width: 90vw;
-        bottom: 5px;
-        right: 5px;
-        padding: 15px;
-      }
-      #secretPanel button {
-        width: 100%;
-      }
+      background: #004C99;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="stage">Stage: 1</div>
-    <div class="timer" id="timer">Time: 120</div>
-    <div class="progress-bar"><div class="bar" id="bar"></div></div>
-    <div class="text" id="text"></div>
-    <textarea id="input" placeholder="Start typing here..." autofocus></textarea>
-    <button onclick="restart()">Restart</button>
-    <input id="secretInput" placeholder="Type secret code here..." />
-  </div>
-
+  <div id="stage">Stage: 1</div>
+  <div class="timer" id="timer">Time: 120</div>
+  <div class="progress-bar"><div class="bar" id="bar"></div></div>
+  <div class="text" id="text"></div>
+  <textarea id="input" placeholder="Start typing here..." autofocus></textarea>
+  <button onclick="restart()">Restart</button>
+  <input id="secretInput" placeholder="Enter secret code here (small)" />
   <div id="secretPanel">
-    <div>Secret Panel Activated</div>
-    <button id="autoTypeBtn">AutoType</button>
-    <button id="closePanel">Close</button>
+    <button id="autoType">AutoType</button>
+    <button id="closeSecret" style="margin-top: 6px; background: #c33;">Close</button>
   </div>
 
-  <script>
-    const stages = [
-      `In the twilight of a serene evening, the sun dipped below the horizon painting the sky with hues of orange and crimson as gentle breezes whispered through the leaves.`,
-      `A vast expanse of ancient forests stretched endlessly, where the songs of myriad birds intertwined with the rustling trees creating a symphony of nature’s purest music.`,
-      `Through winding rivers and rugged mountains, the brave adventurers journeyed beyond the known realms seeking treasures hidden within enchanted caves guarded by mystical beasts.`,
-      `The whispered legends spoke of a radiant crystal that held the power to heal all wounds and bestow eternal wisdom, guarded fiercely by shadows lurking in forgotten ruins.`,
-      `As dawn broke over the sleepy village, golden rays illuminated cobblestone streets bustling with merchants, children’s laughter, and the scent of freshly baked bread wafting in the air.`,
-      `Beneath the vast star-studded canvas of night, the ancient temple stood tall, its intricate carvings telling tales of gods and heroes long faded into legend but never forgotten.`,
-      `The playwright penned an elaborate narrative filled with twists and revelations that challenged the audience’s perception of truth, reality, and illusion within the fleeting moments of performance.`,
-      `Hidden within dusty tomes and scrolls lay secrets of lost civilizations, their profound knowledge waiting patiently for the curious minds to decipher and unlock forgotten mysteries.`,
-      `Amid the chaotic storm, determined ships fought relentless waves, with every sailor grasping hope tightly as the beacon of the lighthouse promised safe passage through treacherous waters.`,
-      `In realms where magic intertwined with technology, towering cities shimmered with light and sound, while inhabitants explored the delicate balance between ancient wisdom and futuristic innovation.`
-    ];
-    
-    let currentStage = 0;
-    let charEls = [];
-    let timerInterval = null;
-    let startTime = null;
-    const timeLimit = 120; // 2 minutes per stage
-    let gameEnded = false;
-    let autoTyping = false;
-    let autoTypeIndex = 0;
-    let autoTypeInterval = null;
+<script>
+  const stages = [
+    "In the twilight of a serene evening, the sun dipped below the horizon painting the sky with hues of orange and crimson as gentle breezes whispered through the leaves.",
+    "A vast expanse of ancient forests stretched endlessly, where the songs of myriad birds intertwined with the rustling trees creating a symphony of nature’s purest music.",
+    "Through winding rivers and rugged mountains, the brave adventurers journeyed beyond the known realms seeking treasures hidden within enchanted caves guarded by mystical beasts.",
+    "The whispered legends spoke of a radiant crystal that held the power to heal all wounds and bestow eternal wisdom, guarded fiercely by shadows lurking in forgotten ruins.",
+    "As dawn broke over the sleepy village, golden rays illuminated cobblestone streets bustling with merchants, children’s laughter, and the scent of freshly baked bread wafting in the air.",
+    "Beneath the vast star-studded canvas of night, the ancient temple stood tall, its intricate carvings telling tales of gods and heroes long faded into legend but never forgotten.",
+    "The playwright penned an elaborate narrative filled with twists and revelations that challenged the audience’s perception of truth, reality, and illusion within the fleeting moments of performance.",
+    "Hidden within dusty tomes and scrolls lay secrets of lost civilizations, their profound knowledge waiting patiently for the curious minds to decipher and unlock forgotten mysteries.",
+    "Amid the chaotic storm, determined ships fought relentless waves, with every sailor grasping hope tightly as the beacon of the lighthouse promised safe passage through treacherous waters.",
+    "In realms where magic intertwined with technology, towering cities shimmered with light and sound, while inhabitants explored the delicate balance between ancient wisdom and futuristic innovation."
+  ];
 
-    const textEl = document.getElementById("text");
-    const inputEl = document.getElementById("input");
-    const stageEl = document.getElementById("stage");
-    const timerEl = document.getElementById("timer");
-    const barEl = document.getElementById("bar");
-    const secretInput = document.getElementById("secretInput");
-    const secretPanel = document.getElementById("secretPanel");
-    const autoTypeBtn = document.getElementById("autoTypeBtn");
-    const closePanelBtn = document.getElementById("closePanel");
+  let currentStage = 0;
+  let charEls = [];
+  let timerInterval = null;
+  let startTime = null;
+  const timeLimit = 120; // seconds
+  let gameEnded = false;
+  let autoTyping = false;
+  let autoTypeIndex = 0;
+  let autoTypeInterval = null;
 
-    function populateText(str) {
-      textEl.innerHTML = "";
-      charEls = [];
-      str.split("").forEach(letter => {
-        const span = document.createElement("span");
-        span.innerText = letter;
-        textEl.appendChild(span);
-        charEls.push(span);
-      });
+  const textEl = document.getElementById('text');
+  const inputEl = document.getElementById('input');
+  const stageEl = document.getElementById('stage');
+  const timerEl = document.getElementById('timer');
+  const barEl = document.getElementById('bar');
+  const secretInput = document.getElementById('secretInput');
+  const secretPanel = document.getElementById('secretPanel');
+  const autoTypeBtn = document.getElementById('autoType');
+  const closeSecretBtn = document.getElementById('closeSecret');
+
+  function populateText(str) {
+    textEl.innerHTML = '';
+    charEls = [];
+    str.split('').forEach(letter => {
+      const span = document.createElement('span');
+      span.innerText = letter;
+      textEl.appendChild(span);
+      charEls.push(span);
+    });
+  }
+
+  function resetCharEls() {
+    charEls.forEach(charEl => {
+      charEl.classList.remove('correct');
+      charEl.classList.remove('wrong');
+    });
+  }
+
+  function startGame() {
+    inputEl.value = '';
+    gameEnded = false;
+    autoTyping = false;
+    if(autoTypeInterval){
+      clearInterval(autoTypeInterval);
+      autoTypeInterval = null;
     }
+    if(currentStage >= stages.length) currentStage = 0;
+    stageEl.innerText = 'Stage: ' + (currentStage + 1);
+    populateText(stages[currentStage]);
+    barEl.style.width = '0%';
+    timerEl.innerText = 'Time: ' + timeLimit;
+    if(timerInterval) clearInterval(timerInterval);
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 100);
+  }
 
-    function resetCharEls() {
-      charEls.forEach(charEl => {
-        charEl.classList.remove("correct");
-        charEl.classList.remove("wrong");
-      });
+  function endGame(success) {
+    gameEnded = true;
+    if(autoTypeInterval){
+      clearInterval(autoTypeInterval);
+      autoTypeInterval = null;
     }
+    clearInterval(timerInterval);
+    setTimeout(() => {
+      if(success){
+        alert('Well Done! You finished stage ' + (currentStage + 1) + '.');
+        currentStage++;
+        startGame();
+      } else {
+        alert('Time\'s up! Try again.');
+        startGame();
+      }
+    }, 100);
+  }
 
-    function startGame() {
-      inputEl.value = "";
-      gameEnded = false;
-      autoTyping = false;
-      if (autoTypeInterval) {
+  function updateTimer() {
+    let elapsed = Math.floor((Date.now() - startTime) / 1000);
+    timerEl.innerText = 'Time: ' + (timeLimit - elapsed);
+    if((timeLimit - elapsed) <= 0 && !gameEnded){
+      endGame(false);
+    }
+  }
+
+  function updateProgressBar(percent) {
+    barEl.style.width = percent + '%';
+  }
+
+  inputEl.addEventListener('input', () => {
+    if(gameEnded || autoTyping) return;
+    const val = inputEl.value;
+    resetCharEls();
+    let errorCount = 0;
+    let currentText = stages[currentStage];
+    let minLen = Math.min(val.length, currentText.length);
+    for(let i=0; i<minLen; i++){
+      if(val[i] === currentText[i]){
+        charEls[i].classList.add('correct');
+      } else {
+        charEls[i].classList.add('wrong');
+        errorCount++;
+      }
+    }
+    updateProgressBar((val.length / currentText.length) * 100);
+    if(val.length === currentText.length && errorCount === 0){
+      endGame(true);
+    }
+  });
+
+  // Secret code input logic
+  secretInput.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      if(secretInput.value.trim() === 'DEANISCOOLBEANSLOL'){
+        secretPanel.style.display = 'block';
+        secretInput.value = '';
+        secretInput.blur();
+      }
+    }
+  });
+
+  autoTypeBtn.addEventListener('click', () => {
+    if(autoTyping) return;
+    autoTyping = true;
+    inputEl.value = '';
+    autoTypeIndex = 0;
+    resetCharEls();
+
+    autoTypeInterval = setInterval(() => {
+      if(autoTypeIndex < stages[currentStage].length){
+        inputEl.value += stages[currentStage][autoTypeIndex];
+        inputEl.dispatchEvent(new Event('input'));
+        autoTypeIndex++;
+      } else {
         clearInterval(autoTypeInterval);
-        autoTypeInterval = null;
-      }
-      if (currentStage >= stages.length) currentStage = 0;
-      stageEl.innerText = "Stage: " + (currentStage + 1);
-      populateText(stages[currentStage]);
-      barEl.style.width = "0%";
-      timerEl.innerText = "Time: " + timeLimit;
-      if(timerInterval) clearInterval(timerInterval);
-      startTime = Date.now();
-      timerInterval = setInterval(updateTimer, 100);
-    }
-
-    function endGame(success) {
-      gameEnded = true;
-      if (autoTypeInterval) {
-        clearInterval(autoTypeInterval);
-        autoTypeInterval = null;
-      }
-      clearInterval(timerInterval);
-      setTimeout(() => {
-        if (success) {
-          alert("Well Done! You finished stage " + (currentStage + 1) + ".");
-          currentStage++;
-          startGame();
-        } else {
-          alert("Time's up! Try again.");
-          startGame();
-        }
-      }, 100);
-    }
-
-    function updateTimer() {
-      let elapsed = Math.floor((Date.now() - startTime) / 1000);
-      timerEl.innerText = "Time: " + (timeLimit - elapsed);
-      if ((timeLimit - elapsed) <= 0 && !gameEnded) {
-        endGame(false);
-      }
-    }
-
-    function updateProgressBar(percent) {
-      barEl.style.width = percent + "%";
-    }
-
-    inputEl.addEventListener("input", () => {
-      if (gameEnded || autoTyping) return;
-      const val = inputEl.value;
-      resetCharEls();
-      let errorCount = 0;
-      let currentText = stages[currentStage];
-      let minLen = Math.min(val.length, currentText.length);
-      for (let i = 0; i < minLen; i++) {
-        if (val[i] === currentText[i]) {
-          charEls[i].classList.add("correct");
-        } else {
-          charEls[i].classList.add("wrong");
-          errorCount++;
-        }
-      }
-      updateProgressBar((val.length / currentText.length) * 100);
-      if (val.length === currentText.length && errorCount === 0) {
+        autoTyping = false;
         endGame(true);
       }
-    });
+    }, 20);
+  });
 
-    // Secret code input handler
-    secretInput.addEventListener("keydown", e => {
-      if(e.key === "Enter") {
-        const code = secretInput.value.trim();
-        if(code === "DEANISCOOLBEANSLOL") {
-          secretInput.value = "";
-          secretPanel.style.display = "flex";
-          secretInput.blur();
-        }
-      }
-    });
+  closeSecretBtn.addEventListener('click', () => {
+    secretPanel.style.display = 'none';
+    inputEl.focus();
+  });
 
-    autoTypeBtn.addEventListener("click", () => {
-      if (autoTyping) return;
-      autoTyping = true;
-      inputEl.value = "";
-      autoTypeIndex = 0;
-      resetCharEls();
+  function restart() {
+    currentStage = 0;
+    startGame();
+    secretPanel.style.display = 'none';
+  }
 
-      autoTypeInterval = setInterval(() => {
-        if (autoTypeIndex < stages[currentStage].length) {
-          inputEl.value += stages[currentStage][autoTypeIndex];
-          // Trigger input event manually to update highlights and bar
-          inputEl.dispatchEvent(new Event('input'));
-          autoTypeIndex++;
-        } else {
-          clearInterval(autoTypeInterval);
-          autoTyping = false;
-          endGame(true);
-        }
-      }, 20); // Types a character every 20ms for fast auto typing
-    });
-
-    closePanelBtn.addEventListener("click", () => {
-      secretPanel.style.display = "none";
-      inputEl.focus();
-    });
-
-    function restart() {
-      currentStage = 0;
-      startGame();
-      secretPanel.style.display = "none";
-    }
-
-    window.onload = startGame;
-  </script>
+  window.onload = startGame;
+</script>
 </body>
 </html>
