@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Typing Game with Levels</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f5f5f5;
+      box-shadow: 0 0 10px #ccc;
+    }
+    .text {
+      font-size: 22px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+      min-height: 40px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .progress-bar {
+      height: 6px;
+      margin-bottom: 18px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0;
+      background: #3bce63;
+      transition: width 0.2s;
+      border-radius: 3px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 40px;
+      font-size: 20px;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      box-sizing: border-box;
+      resize: none;
+      background: #fafafa;
+    }
+    .correct {
+      color: #32a852;
+      background: #e7ffe1;
+      border-radius: 2px;
+    }
+    .wrong {
+      color: #ff3131;
+      background: #ffe8e8;
+      border-radius: 2px;
+    }
+    .timer {
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: block;
+      font-size: 18px;
+      text-align: right;
+    }
+    #stage {
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 8px 18px;
+      font-size: 16px;
+      background: #32a852;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    button:hover {
+      background: #2b9144;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">Stage: 1</div>
+  <div class="timer" id="timer">Time: 30</div>
+  <div class="progress-bar"><div class="bar" id="bar"></div></div>
+  <div class="text" id="text"></div>
+  <textarea id="input" placeholder="Start typing here..." autofocus></textarea>
+  <button onclick="restart()">Restart</button>
+
+  <script>
+    const stages = [
+      "Type this as fast as possible.",
+      "Practice makes perfect in typing.",
+      "The quick brown fox jumps over the lazy dog.",
+      "Improve your keyboard speed and accuracy here.",
+      "Learning to type quickly requires patience and practice.",
+      "A fast typist can complete tasks much more efficiently.",
+      "Sophisticated keyboarding skills boost productivity significantly.",
+      "Consistent practice helps you master complicated sentences.",
+      "Complex sentences test your dexterity and concentration.",
+      "Congratulations on reaching the highest typing challenge!"
+    ];
+
+    let currentStage = 0;
+    let charEls = [];
+    let timerInterval = null;
+    let startTime = null;
+    let timeLimit = 30;
+    let gameEnded = false;
+
+    function populateText(str) {
+      const text = document.getElementById("text");
+      text.innerHTML = "";
+      charEls = [];
+      str.split("").forEach(letter => {
+        const span = document.createElement("span");
+        span.innerText = letter;
+        text.appendChild(span);
+        charEls.push(span);
+      });
+    }
+
+    function resetCharEls() {
+      charEls.forEach(charEl => {
+        charEl.classList.remove("correct");
+        charEl.classList.remove("wrong");
+      });
+    }
+
+    function startGame() {
+      document.getElementById("input").value = "";
+      gameEnded = false;
+      if (currentStage >= stages.length) currentStage = 0;
+      document.getElementById("stage").innerText = "Stage: " + (currentStage + 1);
+      populateText(stages[currentStage]);
+      document.getElementById("bar").style.width = "0%";
+      document.getElementById("timer").innerText = "Time: " + timeLimit;
+      if (timerInterval) clearInterval(timerInterval);
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 100);
+    }
+
+    function endGame(success) {
+      gameEnded = true;
+      clearInterval(timerInterval);
+      setTimeout(() => {
+        if (success) {
+          alert("Well Done! You finished stage " + (currentStage + 1) + ".");
+          currentStage++;
+          startGame();
+        } else {
+          alert("Time's up! Try again.");
+          startGame();
+        }
+      }, 100);
+    }
+
+    function updateTimer() {
+      let elapsed = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById("timer").innerText = "Time: " + (timeLimit - elapsed);
+      if (elapsed > timeLimit && !gameEnded) {
+        endGame(false);
+      }
+    }
+
+    function updateProgressBar(percent) {
+      document.getElementById("bar").style.width = percent + "%";
+    }
+
+    document.getElementById("input").addEventListener("input", () => {
+      if (gameEnded) return;
+      const val = document.getElementById("input").value;
+      resetCharEls();
+      let errorCount = 0;
+      let currentText = stages[currentStage];
+      let minLen = Math.min(val.length, currentText.length);
+      for (let i = 0; i < minLen; i++) {
+        if (val[i] === currentText[i]) {
+          charEls[i].classList.add("correct");
+        } else {
+          charEls[i].classList.add("wrong");
+          errorCount++;
+        }
+      }
+      updateProgressBar((val.length / currentText.length) * 100);
+      if (val.length === currentText.length && errorCount === 0) {
+        endGame(true);
+      }
+    });
+
+    function restart() {
+      currentStage = 0;
+      startGame();
+    }
+
+    // Start first stage on load
+    window.onload = startGame;
+  </script>
+</body>
+</html>
