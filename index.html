@@ -1,147 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Typing Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 30px auto;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Typing Game 20 Parts</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    background: #ffffffdd;
+    box-shadow: 0 20px 40px rgb(0 0 0 / 0.2);
+    border-radius: 15px;
+    width: 700px;
+    max-width: 95vw;
+    padding: 30px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+  }
+  #stage {
+    font-weight: bold;
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+  #timer {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: right;
+    margin-bottom: 20px;
+    user-select: none;
+  }
+  .progress-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.1);
+  }
+  .bar {
+    height: 100%;
+    width: 0;
+    background: #5a9bf6;
+    border-radius: 10px 0 0 10px;
+    transition: width 0.25s ease;
+    box-shadow: 0 0 8px #5a9bf6aa;
+  }
+  #text {
+    font-size: 24px;
+    line-height: 1.5;
+    letter-spacing: 1.2px;
+    min-height: 110px;
+    padding: 20px 25px;
+    background: #fefefe;
+    border-radius: 15px;
+    border: 2px solid #c1c1c1;
+    margin-bottom: 30px;
+    box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.06);
+    user-select: none;
+    white-space: pre-wrap;
+  }
+  .correct {
+    color: #28a745;
+    background: #d4edda;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  .wrong {
+    color: #dc3545;
+    background: #f8d7da;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  #input {
+    width: 100%;
+    min-height: 80px;
+    font-size: 20px;
+    padding: 18px 25px;
+    border-radius: 15px;
+    border: 2px solid #999;
+    resize: none;
+    box-sizing: border-box;
+    box-shadow: 0 5px 15px rgb(0 0 0 / 0.05);
+    font-family: monospace;
+    color: #222;
+    margin-bottom: 16px;
+    outline-offset: 2px;
+    outline-color: #5a9bf6;
+  }
+  #input:focus {
+    border-color: #5a9bf6;
+    box-shadow: 0 0 8px #5a9bf6aa;
+  }
+  button {
+    padding: 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    background: #5a9bf6;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(90,155,246,0.5);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #4178d1;
+    box-shadow: 0 12px 20px rgba(65,120,209,0.7);
+  }
+  #secretInput {
+    margin-top: 14px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: monospace;
+    color: #555;
+  }
+  #secretPanel {
+    display: none;
+    padding: 14px 20px;
+    background: #222d42ee;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+    color: #eee;
+    margin-top: 16px;
+    text-align: center;
+  }
+  #secretPanel button {
+    background: #28a745;
+    width: 100%;
+    margin-top: 12px;
+    border-radius: 12px;
+    padding: 12px 0;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  #secretPanel button:hover {
+    background: #1e7e34;
+    box-shadow: 0 12px 22px rgba(30,126,52,0.8);
+  }
+  #closeSecretBtn {
+    background: #dc3545;
+    margin-top: 10px;
+  }
+  #closeSecretBtn:hover {
+    background: #a71d2a;
+  }
+  @media (max-width: 480px) {
+    .container {
+      width: 95vw;
       padding: 20px;
-      background: #f5f5f5;
-      box-shadow: 0 0 10px #ccc;
+    }
+    #text {
+      font-size: 18px;
+      min-height: 90px;
+      padding: 15px 20px;
+    }
+    #input {
+      font-size: 16px;
+      min-height: 60px;
+      padding: 12px 15px;
     }
     #stage {
-      font-weight: bold;
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-    .timer {
-      font-weight: bold;
-      margin-bottom: 10px;
       font-size: 18px;
-      text-align: right;
     }
-    .progress-bar {
-      height: 6px;
-      margin-bottom: 18px;
-      background: #e0e0e0;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .bar {
-      height: 100%;
-      width: 0;
-      background: #3bce63;
-      transition: width 0.2s;
-      border-radius: 3px;
-    }
-    .text {
-      font-size: 22px;
-      margin-bottom: 16px;
-      letter-spacing: 2px;
-      min-height: 60px;
-      padding: 10px;
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    .correct {
-      color: #32a852;
-      background: #e7ffe1;
-      border-radius: 2px;
-    }
-    .wrong {
-      color: #ff3131;
-      background: #ffe8e8;
-      border-radius: 2px;
-    }
-    textarea {
-      width: 100%;
-      min-height: 60px;
-      font-size: 20px;
-      padding: 10px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-      box-sizing: border-box;
-      resize: none;
-      background: #fafafa;
-      font-family: monospace;
+    #timer {
+      font-size: 16px;
     }
     button {
-      padding: 8px 18px;
       font-size: 16px;
-      background: #32a852;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 6px;
+      padding: 10px 0;
     }
-    button:hover {
-      background: #2b9144;
-    }
-    #secretInput {
-      font-size: 12px;
-      padding: 5px 8px;
-      width: 100%;
-      margin-top: 12px;
-      box-sizing: border-box;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    #secretPanel {
-      display: none;
-      border: 1px solid #888;
-      background: #eee;
-      padding: 12px 16px;
-      margin-top: 12px;
-      border-radius: 5px;
-    }
-    #secretPanel button {
-      background: #0066CC;
-      margin-top: 8px;
-      width: 100%;
-    }
-    #secretPanel button:hover {
-      background: #004C99;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div id="stage">Stage: 1</div>
-  <div class="timer" id="timer">Time: 120</div>
+
+<div class="container" role="main" aria-label="Typing game container">
+  <div id="stage">Stage: 1 / 20</div>
+  <div id="timer">Time: 120</div>
   <div class="progress-bar"><div class="bar" id="bar"></div></div>
-  <div class="text" id="text"></div>
-  <textarea id="input" placeholder="Start typing here..." autofocus></textarea>
-  <button onclick="restart()">Restart</button>
-  <input id="secretInput" placeholder="Enter secret code here (small)" />
-  <div id="secretPanel">
-    <button id="autoType">AutoType</button>
-    <button id="closeSecret" style="margin-top: 6px; background: #c33;">Close</button>
+  <div id="text" aria-live="polite"></div>
+  <textarea id="input" placeholder="Start typing here..." aria-label="Typing input area" autofocus></textarea>
+  <button id="restartBtn">Restart</button>
+  <input id="secretInput" placeholder="Enter secret code here (small)" aria-label="Secret code input" />
+  <div id="secretPanel" role="region" aria-hidden="true" aria-label="Secret panel">
+    <div>Secret Panel Activated</div>
+    <button id="autoTypeBtn" aria-label="Auto type button">AutoType</button>
+    <button id="closeSecretBtn" aria-label="Close secret panel button">Close</button>
   </div>
+</div>
 
 <script>
   const stages = [
-    "In the twilight of a serene evening, the sun dipped below the horizon painting the sky with hues of orange and crimson as gentle breezes whispered through the leaves.",
-    "A vast expanse of ancient forests stretched endlessly, where the songs of myriad birds intertwined with the rustling trees creating a symphony of nature’s purest music.",
-    "Through winding rivers and rugged mountains, the brave adventurers journeyed beyond the known realms seeking treasures hidden within enchanted caves guarded by mystical beasts.",
-    "The whispered legends spoke of a radiant crystal that held the power to heal all wounds and bestow eternal wisdom, guarded fiercely by shadows lurking in forgotten ruins.",
-    "As dawn broke over the sleepy village, golden rays illuminated cobblestone streets bustling with merchants, children’s laughter, and the scent of freshly baked bread wafting in the air.",
-    "Beneath the vast star-studded canvas of night, the ancient temple stood tall, its intricate carvings telling tales of gods and heroes long faded into legend but never forgotten.",
-    "The playwright penned an elaborate narrative filled with twists and revelations that challenged the audience’s perception of truth, reality, and illusion within the fleeting moments of performance.",
-    "Hidden within dusty tomes and scrolls lay secrets of lost civilizations, their profound knowledge waiting patiently for the curious minds to decipher and unlock forgotten mysteries.",
-    "Amid the chaotic storm, determined ships fought relentless waves, with every sailor grasping hope tightly as the beacon of the lighthouse promised safe passage through treacherous waters.",
-    "In realms where magic intertwined with technology, towering cities shimmered with light and sound, while inhabitants explored the delicate balance between ancient wisdom and futuristic innovation."
+`In the twilight of a serene evening, the sun dipped below the horizon painting the sky with hues of orange and crimson as gentle breezes whispered through the leaves.`,
+`A vast expanse of ancient forests stretched endlessly, where the songs of myriad birds intertwined with the rustling trees creating a symphony of nature’s purest music.`,
+`Through winding rivers and rugged mountains, the brave adventurers journeyed beyond the known realms seeking treasures hidden within enchanted caves guarded by mystical beasts.`,
+`The whispered legends spoke of a radiant crystal that held the power to heal all wounds and bestow eternal wisdom, guarded fiercely by shadows lurking in forgotten ruins.`,
+`As dawn broke over the sleepy village, golden rays illuminated cobblestone streets bustling with merchants, children’s laughter, and the scent of freshly baked bread wafting in the air.`,
+`Beneath the vast star-studded canvas of night, the ancient temple stood tall, its intricate carvings telling tales of gods and heroes long faded into legend but never forgotten.`,
+`The playwright penned an elaborate narrative filled with twists and revelations that challenged the audience’s perception of truth, reality, and illusion within the fleeting moments of performance.`,
+`Hidden within dusty tomes and scrolls lay secrets of lost civilizations, their profound knowledge waiting patiently for the curious minds to decipher and unlock forgotten mysteries.`,
+`Amid the chaotic storm, determined ships fought relentless waves, with every sailor grasping hope tightly as the beacon of the lighthouse promised safe passage through treacherous waters.`,
+`In realms where magic intertwined with technology, towering cities shimmered with light and sound, while inhabitants explored the delicate balance between ancient wisdom and futuristic innovation.`,
+`The chronicles of the timekeepers reveal stories of moments caught between the ticking seconds, where fate and destiny entwined in the narrowest margins of decision.`,
+`Surrounded by shimmering lakes and rolling hills, the village festival bloomed in vibrant colors and joyous sounds that echoed through the crisp air of early autumn.`,
+`With every stroke of the painter’s brush, an entire universe blossomed onto the canvas, rich with emotion, texture, and vivid storytelling concealed within pigment and light.`,
+`Scientists delved into the mysteries of the cosmos, uncovering patterns that challenge our understanding of space, time, and the very fabric that holds reality together.`,
+`The explorers ventured into forgotten temples, where ancient glyphs spoke a language only few could read, revealing secrets locked away by generations long past.`,
+`Melodies floated gently over the valley, carried by the wind and weaving through the hearts of all who listened, resurrecting forgotten memories and creating new dreams.`,
+`In the quiet solitude of the library, the aroma of aged paper and ink inspired countless journeys beyond the confines of the real into worlds imagined and unknown.`,
+`As the storm subsided, the first rays of sunlight pierced the clouds, casting golden light on the awakening city streets and renewing hope for a peaceful tomorrow.`,
+`The artisan's hands labored tirelessly, crafting intricate designs in wood and metal, each piece a symbol of tradition, skill, and the enduring spirit of creation.`,
+`Underneath the vast ocean waves, colorful reefs thrived, a bustling metropolis of aquatic life that paints an ever-changing portrait beneath the surface.`
   ];
 
   let currentStage = 0;
   let charEls = [];
   let timerInterval = null;
   let startTime = null;
-  const timeLimit = 120; // seconds
+  const timeLimit = 120; // seconds - 2 minutes
   let gameEnded = false;
   let autoTyping = false;
   let autoTypeIndex = 0;
@@ -154,8 +246,9 @@
   const barEl = document.getElementById('bar');
   const secretInput = document.getElementById('secretInput');
   const secretPanel = document.getElementById('secretPanel');
-  const autoTypeBtn = document.getElementById('autoType');
-  const closeSecretBtn = document.getElementById('closeSecret');
+  const autoTypeBtn = document.getElementById('autoTypeBtn');
+  const closeSecretBtn = document.getElementById('closeSecretBtn');
+  const restartBtn = document.getElementById('restartBtn');
 
   function populateText(str) {
     textEl.innerHTML = '';
@@ -184,13 +277,14 @@
       autoTypeInterval = null;
     }
     if(currentStage >= stages.length) currentStage = 0;
-    stageEl.innerText = 'Stage: ' + (currentStage + 1);
+    stageEl.innerText = `Stage: ${currentStage + 1} / ${stages.length}`;
     populateText(stages[currentStage]);
     barEl.style.width = '0%';
-    timerEl.innerText = 'Time: ' + timeLimit;
+    timerEl.innerText = `Time: ${timeLimit}`;
     if(timerInterval) clearInterval(timerInterval);
     startTime = Date.now();
     timerInterval = setInterval(updateTimer, 100);
+    inputEl.focus();
   }
 
   function endGame(success) {
@@ -202,11 +296,11 @@
     clearInterval(timerInterval);
     setTimeout(() => {
       if(success){
-        alert('Well Done! You finished stage ' + (currentStage + 1) + '.');
+        alert(`Well Done! You finished stage ${currentStage + 1}.`);
         currentStage++;
         startGame();
       } else {
-        alert('Time\'s up! Try again.');
+        alert("Time's up! Try again.");
         startGame();
       }
     }, 100);
@@ -214,19 +308,19 @@
 
   function updateTimer() {
     let elapsed = Math.floor((Date.now() - startTime) / 1000);
-    timerEl.innerText = 'Time: ' + (timeLimit - elapsed);
+    timerEl.innerText = `Time: ${timeLimit - elapsed}`;
     if((timeLimit - elapsed) <= 0 && !gameEnded){
       endGame(false);
     }
   }
 
   function updateProgressBar(percent) {
-    barEl.style.width = percent + '%';
+    barEl.style.width = `${percent}%`;
   }
 
   inputEl.addEventListener('input', () => {
     if(gameEnded || autoTyping) return;
-    const val = inputEl.value;
+    let val = inputEl.value;
     resetCharEls();
     let errorCount = 0;
     let currentText = stages[currentStage];
@@ -239,13 +333,12 @@
         errorCount++;
       }
     }
-    updateProgressBar((val.length / currentText.length) * 100);
+    updateProgressBar((val.length / currentText.length)*100);
     if(val.length === currentText.length && errorCount === 0){
       endGame(true);
     }
   });
 
-  // Secret code input logic
   secretInput.addEventListener('keydown', e => {
     if(e.key === 'Enter'){
       if(secretInput.value.trim() === 'DEANISCOOLBEANSLOL'){
@@ -281,11 +374,11 @@
     inputEl.focus();
   });
 
-  function restart() {
+  restartBtn.addEventListener('click', () => {
     currentStage = 0;
     startGame();
     secretPanel.style.display = 'none';
-  }
+  });
 
   window.onload = startGame;
 </script>
